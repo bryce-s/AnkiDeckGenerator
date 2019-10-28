@@ -61,7 +61,7 @@ class AudioGenerator:
                     backAudio = gTTS(text=backSide, lang=self.backLanguage, slow=False)
                 except AssertionError:
                     print(AssertionError)
-                    print("Probably input is malformatted. Check line {}".format(rowNum))
+                    print("Probably input is malformatted. Check line {}".format(str(rowNum)))
                     exit(1)
 
                 # the filenames have to be unique--what can we do here?
@@ -93,15 +93,15 @@ class AudioGenerator:
                     templates=[
                       {
                           'name': 'Card 1',
-                          'qfmt': '<div class="basicCenter">{{Question}}<br>{{FrontAudio}}</div>',
+                          'qfmt': '{{Question}}<br>{{FrontAudio}}',
                           'afmt': '{{FrontSide}}<hr id="answer">{{Answer}}<br>{{BackAudio}}',
                         },
                     ])
 
-    def buildGenankiDeck(self):
+    def buildGenankiDeck(self, name:str, filename: str, mirror: bool):
         self.__buildGenankiModel()
         deckID: int = random.randrange(1 << 30, 1 << 31)
-        newDeck = genanki.Deck(deckID, 'Deck-'+str(deckID))
+        newDeck = genanki.Deck(deckID, name)
         for cardInfo in self.cardAudioStore:
             newDeck.add_note(genanki.Note(model=self.model, fields=[
                 cardInfo.frontText, 
@@ -110,16 +110,35 @@ class AudioGenerator:
                 "[sound:{}]".format(cardInfo.backAudio)
                 ]
                 ))
+        if mirror:
+            for cardInfo in self.cardAudioStore:
+                newDeck.add_note(genanki.Note(model=self.model, fields=[
+                    cardInfo.backText, 
+                    "[sound:{}]".format(cardInfo.backAudio),
+                    cardInfo.frontText, 
+                    "[sound:{}]".format(cardInfo.frontAudio)]))
         pack = genanki.Package(newDeck)
         pack.media_files = self.mediaFilePaths
         pack.write_to_file('output.apkg')
 
+def printUsageAndExit():
+        print("USAGE: AppendAndGenerate.py input.csv mirror:true kapitalEins")
+        exit(1) 
+
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("USAGE: AppendAndGenerate.py input.csv")
-        exit(1)
+    if len(sys.argv) != 4:
+        printUsageAndExit()
+    mirror: bool = False
+    if (sys.argv[2] != "mirror:true" and sys.argv[2] != "mirror:false"):
+        printUsageAndExit()
+    
+    if (sys.argv[2] == "mirror:true"):
+        mirror = True
+
+    name: str = sys.argv[3]
+
     file: str = sys.argv[1]
     gen: AudioGenerator = AudioGenerator(file)
     gen.generateAudio()
-    gen.buildGenankiDeck()
+    gen.buildGenankiDeck(name, file, mirror)
 
