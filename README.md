@@ -1,6 +1,5 @@
 # AnkiDeckGenerator
-Given a CSV list of terms, we generate a deck of Anki flashcards with audio.
-
+Given a list of delimited terms, we generate an Anki Flashcard package with narration 
 
 # Usage
 
