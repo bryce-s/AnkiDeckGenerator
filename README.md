@@ -4,6 +4,8 @@ Given a CSV list of terms, we generate a deck of Anki flashcards with audio.
 
 # Usage
 
+Note: expects `|` as a delimiter instead of `,`. Quizlet does not wrap its CSVs in quotes ("","")
+
 Unfreeze requirements.txt into your venv.
 
 `python3 AppendAndGenerateAudio.py kap1.csv mirror:true Kap1`
