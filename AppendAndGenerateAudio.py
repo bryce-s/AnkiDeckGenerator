@@ -49,7 +49,7 @@ class AudioGenerator:
 
     def generateAudio(self):
         with open(self.filename) as f:
-            csvReader = csv.reader(f, delimiter=',')
+            csvReader = csv.reader(f, delimiter='|')
             rowNum = 0
             for row in csvReader:
                 rowNum += 1
@@ -107,19 +107,19 @@ class AudioGenerator:
                 cardInfo.frontText, 
                 "[sound:{}]".format(cardInfo.frontAudio), 
                 cardInfo.backText, 
-                "[sound:{}]".format(cardInfo.backAudio)
+                ""
                 ]
                 ))
         if mirror:
             for cardInfo in self.cardAudioStore:
                 newDeck.add_note(genanki.Note(model=self.model, fields=[
                     cardInfo.backText, 
-                    "[sound:{}]".format(cardInfo.backAudio),
+                    "",
                     cardInfo.frontText, 
                     "[sound:{}]".format(cardInfo.frontAudio)]))
         pack = genanki.Package(newDeck)
         pack.media_files = self.mediaFilePaths
-        pack.write_to_file('output.apkg')
+        pack.write_to_file(name + '.apkg')
 
 def printUsageAndExit():
         print("USAGE: AppendAndGenerate.py input.csv mirror:true kapitalEins")
